@@ -174,4 +174,35 @@ let rec insert_at (elem : 'a) (k : int) (xs : 'a list) : 'a list =
   in insert_kth 0 [] xs
 
 let rec range (n : int) (m : int) : int list =
-  if
+  let parity = if n < m then 1 else -1 in
+  let rec range_rec a b =
+    if a = b then [a] else a :: range_rec (a + parity) b
+  in range_rec n m
+
+               (* Arithmetic *)
+let rec prime : int -> bool = function
+  | n when n <= 1 -> false
+  | 2 -> true
+  | n ->
+    let lst =
+      List.filter (fun x -> n mod x = 0)
+                (range 2 (1 + int_of_float (sqrt (float_of_int n))))
+    in List.length lst = 0
+
+let rec gcd (n : int) (m : int) : int =
+  if n mod m = 0 then m
+  else gcd m (n mod m)
+
+let coprime (n : int) (m : int) : bool =
+  gcd n m = 1
+
+let all_primes (n : int) (m : int) : int list =
+  let upperbound =
+    List.filter (fun x -> m mod x = 0)
+                (range 2 (1 + int_of_float (sqrt (float_of_int m)))) in
+  let isprime = function
+    | v when v <= 1 -> false
+    | 2 -> true
+    | v ->
+       List.length (List.filter (fun x -> v mod x = 0) upperbound) = 0 in
+  List.filter isprime (range n m)

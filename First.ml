@@ -1,3 +1,6 @@
+#load "unix.cma";;
+open Unix
+
 let rec last (xs : 'a list) : 'a option =
   match xs with
       | [] -> None
@@ -196,6 +199,9 @@ let rec gcd (n : int) (m : int) : int =
 let coprime (n : int) (m : int) : bool =
   gcd n m = 1
 
+let rec phi (n : int) : int =
+  List.length (List.filter (fun x -> gcd x n = 1) (range 1 n))
+
 let all_primes (n : int) (m : int) : int list =
   let upperbound =
     List.filter (fun x -> m mod x = 0)
@@ -206,3 +212,54 @@ let all_primes (n : int) (m : int) : int list =
     | v ->
        List.length (List.filter (fun x -> v mod x = 0) upperbound) = 0 in
   List.filter isprime (range n m)
+
+let rec factors (n : int) : int list =
+  let rec factors_acc acc m = function
+    | [] -> List.rev (m :: acc) (* this case will not happen *)
+    | (x :: rest) as t ->
+       if x * x > m then List.rev (m :: acc)
+       else if m mod x = 0 then factors_acc (x :: acc) (m / x) t
+       else factors_acc acc m rest
+  in factors_acc [] n (all_primes 2 (int_of_float (sqrt (float_of_int n))))
+
+let rec factorslist (n : int) : int list =
+  let rec factorlist acc m d =
+    if m = 1 then List.rev acc
+    else if d * d > m then List.rev (m :: acc)
+    else if m mod d = 0 then factorlist (d :: acc) (m / d) d
+    else factorlist acc m (d + 1)
+  in factorlist [] n 2
+
+let factors_improved (n : int) : (int * int) list =
+  let rec factors d m =
+    if m = 1 then []
+    else if m mod d = 0 then
+      match factors d (m / d) with
+      | (h, cnt) :: t when h = d -> (h, cnt + 1) :: t
+      | t -> (d, 1) :: t
+    else factors (d + 1) m
+  in factors 2 n
+
+
+let phi_improved (n : int) : int =
+  let primelist = factors_improved n in
+  let rec pow a b =
+    match b with
+    | 0 -> 1
+    | 1 -> a
+    | _ when b mod 2 = 0 -> pow (a * a) (b / 2)
+    | _ when b mod 2 <> 0 -> a * pow (a * a) (b / 2) in
+  List.fold_left
+    (fun x (p, cnt) -> x * (p - 1) * (pow p (pred cnt))) 1 primelist
+
+let timeit f a =
+  let t0 = Unix.gettimeofday() in
+  ignore(f a);
+  let t1 = Unix.gettimeofday() in
+  t1 -. t0
+
+let rec goldbach (n : int) : int * int =
+  let rec goldbach_help d =
+    if prime d && prime (n - d) then (d, n - d)
+    else goldbach_help (d + 1) in
+  goldbach_help 2

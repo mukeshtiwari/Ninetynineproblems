@@ -1,6 +1,7 @@
 #load "unix.cma";;
 open Unix
 
+
 let rec last (xs : 'a list) : 'a option =
   match xs with
       | [] -> None
@@ -258,8 +259,47 @@ let timeit f a =
   let t1 = Unix.gettimeofday() in
   t1 -. t0
 
+(* n should be greater than 2 *)
 let rec goldbach (n : int) : int * int =
   let rec goldbach_help d =
     if prime d && prime (n - d) then (d, n - d)
     else goldbach_help (d + 1) in
   goldbach_help 2
+
+let goldbach_list (n : int) (m : int) : (int * (int * int)) list =
+  let rec goldbachhelp a b acc =
+    if a > b then List.rev acc
+    else if a mod 2 <> 0 then goldbachhelp (succ a) b acc
+    else goldbachhelp (succ a) b ((a, goldbach a) :: acc) in
+  goldbachhelp n m []
+
+let goldbach_limit a b lim =
+  List.filter (fun (_,(x,y)) -> x > lim && y > lim) (goldbach_list a b);;
+
+type bool_expr =
+  | Var of string
+  | Not of bool_expr
+  | And of bool_expr * bool_expr
+  | Or of bool_expr * bool_expr
+
+
+let rec generate_table : 'a list -> ('a * 'b) list list =
+  function
+  | [] -> []
+  | [x] -> [[(x, true)]; [(x, false)]]
+  | x :: xs ->
+     let ret = generate_table xs in
+     List.append (List.map (fun ys -> (x, true) :: ys) ret)
+                 (List.map (fun ys -> (x, false) :: ys) ret)
+
+let rec evaluate (lst : ('a * bool) list) :
+          bool_expr -> bool
+  = function
+  | Var x -> List.assoc x lst
+  | Not exp -> not (evaluate lst exp)
+  | And (eone, etwo) -> (evaluate lst eone) && (evaluate lst etwo)
+  | Or (eone, etwo) -> (evaluate lst eone) || (evaluate lst etwo)
+
+let rec table lst expr =
+  let ret = generate_table lst in
+  List.map (fun x -> (x, evaluate x expr)) ret

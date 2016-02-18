@@ -303,3 +303,30 @@ let rec evaluate (lst : ('a * bool) list) :
 let rec table lst expr =
   let ret = generate_table lst in
   List.map (fun x -> (x, evaluate x expr)) ret
+
+let greycode n =
+  let rec greyinner =
+    function
+    | 1 -> [["0"]; ["1"]]
+    | m ->
+       let ret = greyinner (m - 1) in
+       List.append (List.map (fun p -> "0" :: p) ret)
+                   (List.map (fun p -> "1" :: p) (List.rev ret))
+  in List.map (String.concat "") (greyinner n)
+
+let rec subset : 'a list -> 'a list list  = function
+  | [] -> [[]]
+  | x :: xs ->
+     let ret = subset xs in
+     List.append ret (List.map (fun y -> x :: y) ret)
+
+let delete x xs = List.filter (fun y -> x <> y) xs
+
+let concatMap (f : 'a -> 'b list) (l : 'a list) : 'b list =
+  List.(concat (map f l))
+
+let rec perm (xs : 'a list) : 'a list list =
+  match xs with
+  | [] -> [[]]
+  | ts ->
+     concatMap (fun x -> List.map (fun y -> x :: y) (perm (delete x ts))) ts

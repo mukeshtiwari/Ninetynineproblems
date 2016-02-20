@@ -1,7 +1,6 @@
 #load "unix.cma";;
 open Unix
 
-
 let rec last (xs : 'a list) : 'a option =
   match xs with
       | [] -> None
@@ -323,10 +322,18 @@ let rec subset : 'a list -> 'a list list  = function
 let delete x xs = List.filter (fun y -> x <> y) xs
 
 let concatMap (f : 'a -> 'b list) (l : 'a list) : 'b list =
-  List.(concat (map f l))
+  List.map f l |> List.concat
+(*List.(concat (map f l))*)
 
 let rec perm (xs : 'a list) : 'a list list =
   match xs with
   | [] -> [[]]
   | ts ->
      concatMap (fun x -> List.map (fun y -> x :: y) (perm (delete x ts))) ts
+
+(* leave huffman for moment. Implement your own priority queue
+to understand module system *)
+
+type 'a binary_tree =
+  | Empty
+  | Node of 'a * 'a binary_tree * 'a binary_tree

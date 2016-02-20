@@ -1,0 +1,8 @@
+Generating native code from compiler
+ocamlfind ocamlopt -o fetchreddit  -linkpkg -package cohttp.lwt fetchreddit.ml
+Working with merlin (https://github.com/the-lambda-church/merlin/wiki/emacs-from-scratch, See using libraries and syntax extension)
+importing libraries in emacs buffer (M-x merlin-use)
+enable syntax (M-X merlin-extension-enable)
+Working in toplevel (repl)
+# #use "topfind";;
+# #require "lwt";; (and other libraries)

@@ -11,3 +11,4 @@ for using core
 # #thread;;
 # #require "core";
 to load ocaml file (#use "filename.ml";;);
+http://mirror.ocamlcore.org/wiki.cocan.org/tips_for_using_the_ocaml_toplevel.html

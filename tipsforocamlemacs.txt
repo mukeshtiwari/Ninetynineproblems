@@ -6,3 +6,8 @@ enable syntax (M-X merlin-extension-enable)
 Working in toplevel (repl)
 # #use "topfind";;
 # #require "lwt";; (and other libraries)
+for using core 
+# #use "topfind";;
+# #thread;;
+# #require "core";
+to load ocaml file (#use "filename.ml";;);

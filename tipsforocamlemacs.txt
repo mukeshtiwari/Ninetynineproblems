@@ -12,3 +12,4 @@ for using core
 # #require "core";
 to load ocaml file (#use "filename.ml";;);
 http://mirror.ocamlcore.org/wiki.cocan.org/tips_for_using_the_ocaml_toplevel.html
+http://mads-hartmann.com/ocaml/2014/01/05/using-utop-in-emacs.html

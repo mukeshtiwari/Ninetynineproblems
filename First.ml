@@ -335,15 +335,9 @@ let rec perm (xs : 'a list) : 'a list list =
 (* leave huffman for moment. Implement your own priority queue
 to understand module system *)
 
-type 'a binary_tree =
-  | Empty
-  | Node of 'a * 'a binary_tree * 'a binary_tree
 
 
-(* This code is taken from https://www.lri.fr/~filliatr/ftp/ocaml/ds/leftistheap.ml.html *) 
-
-
-                                     
+(* This code is taken from https://www.lri.fr/~filliatr/ftp/ocaml/ds/leftistheap.ml.html *)
 module type Ordered = sig
   type t
   val le : t -> t -> bool
@@ -360,6 +354,7 @@ sig
   val min : t -> X.t
   val extract_min : t -> X.t * t
   val merge : t -> t -> t
+  val num_element : t -> int
 end
   =
   struct
@@ -397,6 +392,45 @@ end
       | E -> raise Empty
       | T (_, x, a, b) -> x, merge a b
 
+    let rec num_element = function
+      | E -> 0
+      | T(_, _, l, r) -> 1 + num_element l + num_element r
+
   end
-                                      
- 
+
+    
+type tree =
+  | Leaf of string
+  | Node of tree * tree
+  
+module Heap = Make (struct
+                     type t = tree * int
+                     let le = fun a b -> snd a < snd b
+                   end)
+
+(* convert string * int as heap *)
+let convert_heap  =
+  List.fold_left (fun x (f, s) -> Heap.insert (Leaf f, s) x) Heap.empty
+
+let rec huffman_tree ht =
+  let c = Heap.num_element ht in
+  if c = 1 then ht else
+    let ((f, x), ht1) = Heap.extract_min ht in
+    let ((s, y), ht2) = Heap.extract_min ht1 in
+    huffman_tree (Heap.insert (Node (f, s), x + y) ht2) 
+
+
+let rec traverse_tree pfix = function
+  | Leaf s -> [(s, pfix)]
+  | Node(l, r) ->
+     traverse_tree (pfix ^ "0") l
+     @ traverse_tree (pfix ^ "1") r  
+
+(* glue code *)
+let huffman fs =
+  let hp = convert_heap fs in
+  let ((tr, _), _) = Heap.extract_min (huffman_tree hp) in
+  traverse_tree "" tr
+
+let t = [ ("a", 45); ("b", 13); ("c", 12); ("d", 16);
+          ("e", 9); ("f", 5) ]  

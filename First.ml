@@ -434,3 +434,27 @@ let huffman fs =
 
 let t = [ ("a", 45); ("b", 13); ("c", 12); ("d", 16);
           ("e", 9); ("f", 5) ]  
+
+type 'a binary_tree =
+  | Empty : 'a binary_tree
+  | Node : 'a * 'a binary_tree * 'a binary_tree -> 'a binary_tree
+
+let example_tree =
+  Node('a', Node('b', Node('d', Empty, Empty), Node('e', Empty, Empty)),
+       Node('c', Empty, Node('f', Node('g', Empty, Empty), Empty)))
+
+let add_trees_with left right all =
+  let add_right_tree all l =
+    List.fold_left (fun a r -> Node('x', l, r) :: a) all right in
+  List.fold_left add_right_tree all left
+                 
+let rec cbal_tree n =
+  match n with
+  | 0 -> [Empty]
+  | _ when n mod 2 = 1 ->
+     let t = cbal_tree (n / 2) in
+     add_trees_with t t []
+  | _ ->
+     let t1 = cbal_tree (n / 2 - 1) in
+     let t2 = cbal_tree (n / 2) in
+     add_trees_with t1 t2 (add_trees_with t2 t1 [])

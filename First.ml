@@ -458,3 +458,37 @@ let rec cbal_tree n =
      let t1 = cbal_tree (n / 2 - 1) in
      let t2 = cbal_tree (n / 2) in
      add_trees_with t1 t2 (add_trees_with t2 t1 [])
+
+let rec is_mirror left right =
+  match left, right with
+  | Empty, Empty -> true
+  | Empty, Node (_, _, _) | Node (_, _, _), Empty -> false
+  | Node (_, l1, r1), Node (_, l2, r2) -> is_mirror l1 r2 && is_mirror r1 l2
+
+let is_symmetric = function
+  | Empty -> true
+  | Node (_, l, r) -> is_mirror l r
+
+let rec construct_helper x = function
+  | Empty -> Node (x, Empty, Empty)
+  | Node (y, l, r) ->
+     if x <= y then Node (y, construct_helper x l, r)
+     else Node (y, l, construct_helper x r)
+
+let construct lst =
+  List.fold_left (fun x y -> construct_helper y x) Empty lst 
+  
+let sym_cbal_trees n =
+  List.filter is_symmetric (cbal_tree n)
+
+                                     
+let rec hbal_tree n =
+  match n with
+  | 0 -> [Empty]
+  | 1 -> [Node ('x', Empty, Empty)]
+  | _ ->
+     let t1 = hbal_tree (n - 2) in
+     let t2 = hbal_tree (n - 1) in
+     add_trees_with t1 t2 [] @ add_trees_with t2 t1 [] @ add_trees_with t2 t2 []
+                    
+                 

@@ -492,3 +492,24 @@ let rec hbal_tree n =
      add_trees_with t1 t2 [] @ add_trees_with t2 t1 [] @ add_trees_with t2 t2 []
                     
                  
+let rec min_nodes = function
+  | 0 -> 0
+  | 1 -> 1
+  | n -> min_nodes (n - 1) + min_nodes (n - 2) + 1
+
+let rec count_leaves = function
+  | Empty -> 0
+  | Node (_, Empty, Empty) -> 1
+  | Node (_, l, r) -> count_leaves l + count_leaves r
+                                                    
+  
+let rec internals = function
+  | Empty | Node (_, Empty, Empty) -> []
+  | Node (c, l, r) -> internals l @ (c :: internals r)
+
+let rec at_level tree n =
+  match tree with
+  | Empty -> []
+  | Node (c, l, r) ->
+     if n = 1 then [c]
+     else  at_level l (n - 1) @ at_level r (n - 1)
